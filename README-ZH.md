@@ -2,8 +2,6 @@
 
 <h1>The Evolution of Attention in Large Language Models: Mechanisms, Trade-offs, and Emerging Trends</h1>
 
-<hr>
-
 <p><strong>Zhentao Tan, Jingyi Shen, Yanbo Li, Yao Liu, Yue Wu, Jieping Ye</strong><br>
 Alibaba Token Hub, Alibaba Group</p>
 
