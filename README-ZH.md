@@ -217,58 +217,42 @@ Softmax 注意力保留可枚举的显式记忆单元和归一化读出，其主
 
 ### 记忆表示效率
 
-该类别在保留 Softmax 精确读出的前提下，降低每个 token 的 KV 表示成本。
+该类别在保留 Softmax 精确读出的前提下降低每个 token 的 KV 表示成本，涵盖从 MHA 经 GQA 到 MQA 的头共享谱系、低维潜在 KV 通道压缩，以及跨层 KV 共享。
 
-  - **头共享谱系：** 以 MHA 作为各头独立存储 KV 的基线，再通过 GQA 和 MQA 逐步让查询头共享 KV 状态，以减少缓存规模和解码带宽。
-  - **通道压缩：** 使用低维潜在 KV 通道存储每个 token，同时保留 token 级检索能力。
-  - **跨层 KV 共享：** 让多个层复用承载内容的 KV 状态，避免为每层分别缓存一份。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Attention Is All You Need](https://proceedings.neurips.cc/paper/7181-attention-is-all-you-need) ![](https://img.shields.io/badge/arXiv-2017.06-red) ![](https://img.shields.io/badge/NeurIPS-2017-yellow) | 头共享谱系 | 2017.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) |
-| [Fast Transformer Decoding: One Write-Head is All You Need](https://arxiv.org/abs/1911.02150) ![](https://img.shields.io/badge/arXiv-2019.11-red) | 头共享谱系 | 2019.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) |
-| [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://aclanthology.org/2023.emnlp-main.298/) ![](https://img.shields.io/badge/arXiv-2023.05-red) ![](https://img.shields.io/badge/EMNLP-2023-yellow) | 头共享谱系 | 2023.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) |
-| [DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model](https://arxiv.org/abs/2405.04434) ![](https://img.shields.io/badge/arXiv-2024.05-red) | 通道压缩 | 2024.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) |
-| [TransMLA: Multi-Head Latent Attention Is All You Need](https://arxiv.org/abs/2502.07864) ![](https://img.shields.io/badge/arXiv-2025.02-red) | 通道压缩 | 2025.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) |
-| [Reducing Transformer Key-Value Cache Size with Cross-Layer Attention](https://arxiv.org/abs/2405.12981) ![](https://img.shields.io/badge/arXiv-2024.05-red) | 跨层 KV 共享 | 2024.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
+- [Attention Is All You Need](https://proceedings.neurips.cc/paper/7181-attention-is-all-you-need) ![](https://img.shields.io/badge/arXiv-2017.06-red) ![](https://img.shields.io/badge/NeurIPS-2017-yellow)
+- [Fast Transformer Decoding: One Write-Head is All You Need](https://arxiv.org/abs/1911.02150) ![](https://img.shields.io/badge/arXiv-2019.11-red)
+- [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://aclanthology.org/2023.emnlp-main.298/) ![](https://img.shields.io/badge/arXiv-2023.05-red) ![](https://img.shields.io/badge/EMNLP-2023-yellow)
+- [DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model](https://arxiv.org/abs/2405.04434) ![](https://img.shields.io/badge/arXiv-2024.05-red)
+- [TransMLA: Multi-Head Latent Attention Is All You Need](https://arxiv.org/abs/2502.07864) ![](https://img.shields.io/badge/arXiv-2025.02-red)
+- [Reducing Transformer Key-Value Cache Size with Cross-Layer Attention](https://arxiv.org/abs/2405.12981) ![](https://img.shields.io/badge/arXiv-2024.05-red)
 
 <a id="sequence-representation-compression"></a>
 
 ### 序列表示压缩
 
-该类别压缩随序列长度增长的历史表示。
+该类别压缩随序列长度增长的历史表示，包括将历史反复整合到固定容量循环记忆中，以及保留近期细节、逐渐粗化远端表示的动态分辨率记忆。
 
-  - **固定容量循环记忆：** 将历史反复整合到数量受限的持久状态或槽位中。
-  - **动态分辨率记忆：** 保留近期上下文的细节，并以逐渐粗化的摘要表示远端历史。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860) ![](https://img.shields.io/badge/arXiv-2019.01-red) | 固定容量循环记忆 | 2019.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Compressive Transformers for Long-Range Sequence Modelling](https://arxiv.org/abs/1911.05507) ![](https://img.shields.io/badge/arXiv-2019.11-red) | 固定容量循环记忆 | 2019.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Recurrent Memory Transformer](https://arxiv.org/abs/2207.06881) ![](https://img.shields.io/badge/arXiv-2022.07-red) | 固定容量循环记忆 | 2022.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [TransformerFAM: Feedback attention is working memory](https://arxiv.org/abs/2404.09173) ![](https://img.shields.io/badge/arXiv-2024.04-red) | 固定容量循环记忆 | 2024.04 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Trellis: Learning to Compress Key-Value Memory in Attention Models](https://arxiv.org/abs/2512.23852) ![](https://img.shields.io/badge/arXiv-2025.12-red) | 固定容量循环记忆 | 2025.12 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Lattice: Learning to Compress the Cache in the Attention](https://research.google/pubs/lattice-learning-to-compress-the-cache-in-the-attention/) ![](https://img.shields.io/badge/Google_Research-2025-yellow) | 固定容量循环记忆 | 2025.04 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Kwai Summary Attention Technical Report](https://arxiv.org/abs/2604.24432) ![](https://img.shields.io/badge/arXiv-2026.04-red) | 动态分辨率记忆 | 2026.04 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence](https://arxiv.org/abs/2606.19348) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 动态分辨率记忆 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
+- [Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860) ![](https://img.shields.io/badge/arXiv-2019.01-red)
+- [Compressive Transformers for Long-Range Sequence Modelling](https://arxiv.org/abs/1911.05507) ![](https://img.shields.io/badge/arXiv-2019.11-red)
+- [Recurrent Memory Transformer](https://arxiv.org/abs/2207.06881) ![](https://img.shields.io/badge/arXiv-2022.07-red)
+- [TransformerFAM: Feedback attention is working memory](https://arxiv.org/abs/2404.09173) ![](https://img.shields.io/badge/arXiv-2024.04-red)
+- [Trellis: Learning to Compress Key-Value Memory in Attention Models](https://arxiv.org/abs/2512.23852) ![](https://img.shields.io/badge/arXiv-2025.12-red)
+- [Lattice: Learning to Compress the Cache in the Attention](https://research.google/pubs/lattice-learning-to-compress-the-cache-in-the-attention/) ![](https://img.shields.io/badge/Google_Research-2025-yellow)
+- [Kwai Summary Attention Technical Report](https://arxiv.org/abs/2604.24432) ![](https://img.shields.io/badge/arXiv-2026.04-red)
+- [DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence](https://arxiv.org/abs/2606.19348) ![](https://img.shields.io/badge/arXiv-2026.06-red)
 
 <a id="readout-and-integration-modulation"></a>
 
 ### 读出与集成调制
 
-该类别不更换底层记忆集合，而是调整注意力读出和多头集成。
+该类别不更换底层记忆集合，而是调整注意力读出和多头集成，包括在值聚合前变换得分或注意力图的调制方式，以及在集成阶段选择或重标定头读出的头路由与输出门控。
 
-  - **得分与注意力图调制：** 在值聚合前变换注意力得分或注意力图。
-  - **头路由与输出门控：** 在多头集成阶段选择或重标定已完成的头读出。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Talking-Heads Attention](https://arxiv.org/abs/2003.02436) ![](https://img.shields.io/badge/arXiv-2020.03-red) | 得分与注意力图调制 | 2020.03 | ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Improving Transformers with Dynamically Composable Multi-Head Attention](https://arxiv.org/abs/2405.08553) ![](https://img.shields.io/badge/arXiv-2024.05-red) | 得分与注意力图调制 | 2024.05 | ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Differential Transformer](https://arxiv.org/abs/2410.05258) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 得分与注意力图调制 | 2024.10 | ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Forgetting Transformer: Softmax Attention with a Forget Gate](https://arxiv.org/abs/2503.02130) ![](https://img.shields.io/badge/arXiv-2025.03-red) | 得分与注意力图调制 | 2025.03 | ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [MoH: Multi-Head Attention as Mixture-of-Head Attention](https://arxiv.org/abs/2410.11842) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 头路由与输出门控 | 2024.10 | ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free](https://arxiv.org/abs/2505.06708) ![](https://img.shields.io/badge/arXiv-2025.05-red) | 头路由与输出门控 | 2025.05 | ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [Talking-Heads Attention](https://arxiv.org/abs/2003.02436) ![](https://img.shields.io/badge/arXiv-2020.03-red)
+- [Improving Transformers with Dynamically Composable Multi-Head Attention](https://arxiv.org/abs/2405.08553) ![](https://img.shields.io/badge/arXiv-2024.05-red)
+- [Differential Transformer](https://arxiv.org/abs/2410.05258) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [Forgetting Transformer: Softmax Attention with a Forget Gate](https://arxiv.org/abs/2503.02130) ![](https://img.shields.io/badge/arXiv-2025.03-red)
+- [MoH: Multi-Head Attention as Mixture-of-Head Attention](https://arxiv.org/abs/2410.11842) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free](https://arxiv.org/abs/2505.06708) ![](https://img.shields.io/badge/arXiv-2025.05-red)
 
 <a id="sparse-attention"></a>
 
@@ -281,95 +265,74 @@ Softmax 注意力保留可枚举的显式记忆单元和归一化读出，其主
 
 ### 结构约束稀疏注意力
 
-该类别用稳定结构限制查询能够访问的 KV 对。
+该类别用稳定结构限制查询能够访问的 KV 对，包括训练前确定拓扑的架构预设模式和从训练后稠密模型规律中提炼的后验发现模式。
 
-  - **架构预设模式：** 在训练前确定稀疏连接拓扑。
-  - **后验发现模式：** 从训练后的稠密模型规律中提炼推理时稀疏规则。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Generating Long Sequences with Sparse Transformers](https://arxiv.org/abs/1904.10509) ![](https://img.shields.io/badge/arXiv-2019.04-red) | 架构预设模式 | 2019.04 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Longformer: The Long-Document Transformer](https://arxiv.org/abs/2004.05150) ![](https://img.shields.io/badge/arXiv-2020.04-red) | 架构预设模式 | 2020.04 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Big Bird: Transformers for Longer Sequences](https://proceedings.neurips.cc/paper/2020/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) ![](https://img.shields.io/badge/arXiv-2020.07-red) ![](https://img.shields.io/badge/NeurIPS-2020-yellow) | 架构预设模式 | 2020.07 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [LongNet: Scaling Transformers to 1,000,000,000 Tokens](https://arxiv.org/abs/2307.02486) ![](https://img.shields.io/badge/arXiv-2023.07-red) | 架构预设模式 | 2023.07 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [PowerAttention: Exponentially Scaling of Receptive Fields for Effective Sparse Attention](https://arxiv.org/abs/2503.03588) ![](https://img.shields.io/badge/arXiv-2025.03-red) | 架构预设模式 | 2025.03 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Efficient Streaming Language Models with Attention Sinks](https://arxiv.org/abs/2309.17453) ![](https://img.shields.io/badge/arXiv-2023.09-red) | 后验发现模式 | 2023.09 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [LM-Infinite: Zero-Shot Extreme Length Generalization for Large Language Models](https://arxiv.org/abs/2308.16137) ![](https://img.shields.io/badge/arXiv-2023.08-red) | 后验发现模式 | 2023.08 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [MInference 1.0: Accelerating Pre-filling for Long-Context LLMs via Dynamic Sparse Attention](https://arxiv.org/abs/2407.02490) ![](https://img.shields.io/badge/arXiv-2024.07-red) | 后验发现模式 | 2024.07 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
+- [Generating Long Sequences with Sparse Transformers](https://arxiv.org/abs/1904.10509) ![](https://img.shields.io/badge/arXiv-2019.04-red)
+- [Longformer: The Long-Document Transformer](https://arxiv.org/abs/2004.05150) ![](https://img.shields.io/badge/arXiv-2020.04-red)
+- [Big Bird: Transformers for Longer Sequences](https://proceedings.neurips.cc/paper/2020/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) ![](https://img.shields.io/badge/arXiv-2020.07-red) ![](https://img.shields.io/badge/NeurIPS-2020-yellow)
+- [LongNet: Scaling Transformers to 1,000,000,000 Tokens](https://arxiv.org/abs/2307.02486) ![](https://img.shields.io/badge/arXiv-2023.07-red)
+- [PowerAttention: Exponentially Scaling of Receptive Fields for Effective Sparse Attention](https://arxiv.org/abs/2503.03588) ![](https://img.shields.io/badge/arXiv-2025.03-red)
+- [Efficient Streaming Language Models with Attention Sinks](https://arxiv.org/abs/2309.17453) ![](https://img.shields.io/badge/arXiv-2023.09-red)
+- [LM-Infinite: Zero-Shot Extreme Length Generalization for Large Language Models](https://arxiv.org/abs/2308.16137) ![](https://img.shields.io/badge/arXiv-2023.08-red)
+- [MInference 1.0: Accelerating Pre-filling for Long-Context LLMs via Dynamic Sparse Attention](https://arxiv.org/abs/2407.02490) ![](https://img.shields.io/badge/arXiv-2024.07-red)
 
 <a id="self-routing-sparse-attention"></a>
 
 ### 自路由稀疏注意力
 
-该类别利用查询和上下文本身生成稀疏候选集。
+该类别利用查询和上下文本身生成稀疏候选集，涵盖动态 token 分组、块聚合与选择，以及摘要 token 路由。
 
-  - **动态 token 分组：** 先对内容相似的查询和键分组，再在组内执行局部 Softmax 注意力。
-  - **块聚合与选择：** 先汇总并排序上下文块，再检索入选块中的原始 KV。
-  - **摘要 token 路由：** 使用学习得到的摘要 token 作为区域或分块的紧凑地址。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Reformer: The Efficient Transformer](https://arxiv.org/abs/2001.04451) ![](https://img.shields.io/badge/arXiv-2020.01-red) ![](https://img.shields.io/badge/ICLR-2020-yellow) | 动态 token 分组 | 2020.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Efficient Content-Based Sparse Attention with Routing Transformers](https://arxiv.org/abs/2003.05997) ![](https://img.shields.io/badge/arXiv-2020.03-red) ![](https://img.shields.io/badge/TACL-2021-yellow) | 动态 token 分组 | 2020.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Quest: Query-Aware Sparsity for Efficient Long-Context LLM Inference](https://arxiv.org/abs/2406.10774) ![](https://img.shields.io/badge/arXiv-2024.06-red) | 块聚合与选择 | 2024.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [XAttention: Block Sparse Attention with Antidiagonal Scoring](https://arxiv.org/abs/2503.16428) ![](https://img.shields.io/badge/arXiv-2025.03-red) | 块聚合与选择 | 2025.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [MoBA: Mixture of Block Attention for Long-Context LLMs](https://arxiv.org/abs/2502.13189) ![](https://img.shields.io/badge/arXiv-2025.02-red) | 块聚合与选择 | 2025.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Optimizing Mixture of Block Attention](https://arxiv.org/abs/2511.11571) ![](https://img.shields.io/badge/arXiv-2025.11-red) | 块聚合与选择 | 2025.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Native Sparse Attention: Hardware-Aligned and Natively Trainable Sparse Attention](https://aclanthology.org/2025.acl-long.1126/) ![](https://img.shields.io/badge/arXiv-2025.02-red) ![](https://img.shields.io/badge/ACL-2025-yellow) | 块聚合与选择 | 2025.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [InfLLM-V2: Dense-Sparse Switchable Attention for Seamless Short-to-Long Adaptation](https://arxiv.org/abs/2509.24663) ![](https://img.shields.io/badge/arXiv-2025.09-red) | 块聚合与选择 | 2025.09 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [DashAttention: Differentiable and Adaptive Sparse Hierarchical Attention](https://arxiv.org/abs/2605.18753) ![](https://img.shields.io/badge/arXiv-2026.05-red) | 块聚合与选择 | 2026.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [COBS: Cumulant Order Block Sparse Attention](https://arxiv.org/abs/2607.09052) ![](https://img.shields.io/badge/arXiv-2026.07-red) | 块聚合与选择 | 2026.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Landmark Attention: Random-Access Infinite Context Length for Transformers](https://arxiv.org/abs/2305.16300) ![](https://img.shields.io/badge/arXiv-2023.05-red) | 摘要 token 路由 | 2023.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Simplified Sparse Attention via Gist Tokens](https://arxiv.org/abs/2604.20920) ![](https://img.shields.io/badge/arXiv-2026.04-red) | 摘要 token 路由 | 2026.04 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Hierarchical Sparse Attention Done Right: Toward Infinite Context Modeling](https://arxiv.org/abs/2607.02980) ![](https://img.shields.io/badge/arXiv-2026.07-red) | 摘要 token 路由 | 2026.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
+- [Reformer: The Efficient Transformer](https://arxiv.org/abs/2001.04451) ![](https://img.shields.io/badge/arXiv-2020.01-red) ![](https://img.shields.io/badge/ICLR-2020-yellow)
+- [Efficient Content-Based Sparse Attention with Routing Transformers](https://arxiv.org/abs/2003.05997) ![](https://img.shields.io/badge/arXiv-2020.03-red) ![](https://img.shields.io/badge/TACL-2021-yellow)
+- [Quest: Query-Aware Sparsity for Efficient Long-Context LLM Inference](https://arxiv.org/abs/2406.10774) ![](https://img.shields.io/badge/arXiv-2024.06-red)
+- [XAttention: Block Sparse Attention with Antidiagonal Scoring](https://arxiv.org/abs/2503.16428) ![](https://img.shields.io/badge/arXiv-2025.03-red)
+- [MoBA: Mixture of Block Attention for Long-Context LLMs](https://arxiv.org/abs/2502.13189) ![](https://img.shields.io/badge/arXiv-2025.02-red)
+- [Optimizing Mixture of Block Attention](https://arxiv.org/abs/2511.11571) ![](https://img.shields.io/badge/arXiv-2025.11-red)
+- [Native Sparse Attention: Hardware-Aligned and Natively Trainable Sparse Attention](https://aclanthology.org/2025.acl-long.1126/) ![](https://img.shields.io/badge/arXiv-2025.02-red) ![](https://img.shields.io/badge/ACL-2025-yellow)
+- [InfLLM-V2: Dense-Sparse Switchable Attention for Seamless Short-to-Long Adaptation](https://arxiv.org/abs/2509.24663) ![](https://img.shields.io/badge/arXiv-2025.09-red)
+- [DashAttention: Differentiable and Adaptive Sparse Hierarchical Attention](https://arxiv.org/abs/2605.18753) ![](https://img.shields.io/badge/arXiv-2026.05-red)
+- [COBS: Cumulant Order Block Sparse Attention](https://arxiv.org/abs/2607.09052) ![](https://img.shields.io/badge/arXiv-2026.07-red)
+- [Landmark Attention: Random-Access Infinite Context Length for Transformers](https://arxiv.org/abs/2305.16300) ![](https://img.shields.io/badge/arXiv-2023.05-red)
+- [Simplified Sparse Attention via Gist Tokens](https://arxiv.org/abs/2604.20920) ![](https://img.shields.io/badge/arXiv-2026.04-red)
+- [Hierarchical Sparse Attention Done Right: Toward Infinite Context Modeling](https://arxiv.org/abs/2607.02980) ![](https://img.shields.io/badge/arXiv-2026.07-red)
 
 <a id="auxiliary-proxy-sparse-routing"></a>
 
 ### 辅助代理稀疏路由
 
-该类别通过轻量辅助索引器估计候选支持集。
+该类别通过轻量辅助索引器估计候选支持集，包括对单个 token 条目排序的 token 粒度代理路由和对上下文块或压缩条目排序的块与压缩条目代理路由。
 
-  - **token 粒度代理路由：** 使用辅助索引器对单个 token 条目排序。
-  - **块与压缩条目代理路由：** 使用代理表示对上下文块或压缩条目排序。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [TokenButler: Token Importance is Predictable](https://arxiv.org/abs/2503.07518) ![](https://img.shields.io/badge/arXiv-2025.03-red) | token 粒度代理路由 | 2025.03 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models](https://arxiv.org/abs/2512.02556) ![](https://img.shields.io/badge/arXiv-2025.12-red) | token 粒度代理路由 | 2025.12 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [LongCat Sparse Attention: Taming the Lightning via Streaming-aware Hierarchical Cross-Layer Indexing](https://arxiv.org/abs/2608.01662) ![](https://img.shields.io/badge/arXiv-2026.08-red) | token 粒度代理路由 | 2026.08 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [SAS: Simple Attention Sparsification via End-to-End Optimization of Context Ranking](https://arxiv.org/abs/2609.13141) ![](https://img.shields.io/badge/arXiv-2026.09-red) | token 粒度代理路由 | 2026.09 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [HashAttention: Semantic Sparsity for Faster Inference](https://arxiv.org/abs/2412.14468) ![](https://img.shields.io/badge/arXiv-2024.12-red) | token 粒度代理路由 | 2024.12 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [HATA: Trainable and Hardware-Efficient Hash-Aware Top-k Attention for Scalable Large Model Inference](https://arxiv.org/abs/2506.02572) ![](https://img.shields.io/badge/arXiv-2025.06-red) ![](https://img.shields.io/badge/Findings_of_ACL-2025-yellow) | token 粒度代理路由 | 2025.06 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [SeerAttention: Learning Intrinsic Sparse Attention in Your LLMs](https://arxiv.org/abs/2410.13276) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 块与压缩条目代理路由 | 2024.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [SeerAttention-R: Sparse Attention Adaptation for Long Reasoning](https://arxiv.org/abs/2506.08889) ![](https://img.shields.io/badge/arXiv-2025.06-red) | 块与压缩条目代理路由 | 2025.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [SpotAttention: Plug-In Block-Sparse Routing for Pretrained Long-Context Transformers](https://arxiv.org/abs/2606.22874) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 块与压缩条目代理路由 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [MiniMax Sparse Attention](https://arxiv.org/abs/2606.13392) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 块与压缩条目代理路由 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [MiniMax-M3](https://huggingface.co/MiniMaxAI/MiniMax-M3) ![](https://img.shields.io/badge/Model_Card-2026-yellow) | 块与压缩条目代理路由 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [On the Design of Qwen3.8-Next Architecture: Evaluation, Efficiency, and Training Stability](https://arxiv.org/abs/2608.30320) ![](https://img.shields.io/badge/arXiv-2026.08-red) | 块与压缩条目代理路由 | 2026.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Qwen3.8-Flash-Next Technical Report and Model Card](https://github.com/QwenLM/Qwen3.8-Flash-Next) ![](https://img.shields.io/badge/Technical_Report-2026-yellow) | 块与压缩条目代理路由 | 2026.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence](https://arxiv.org/abs/2606.19348) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 块与压缩条目代理路由 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
+- [TokenButler: Token Importance is Predictable](https://arxiv.org/abs/2503.07518) ![](https://img.shields.io/badge/arXiv-2025.03-red)
+- [DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models](https://arxiv.org/abs/2512.02556) ![](https://img.shields.io/badge/arXiv-2025.12-red)
+- [LongCat Sparse Attention: Taming the Lightning via Streaming-aware Hierarchical Cross-Layer Indexing](https://arxiv.org/abs/2608.01662) ![](https://img.shields.io/badge/arXiv-2026.08-red)
+- [SAS: Simple Attention Sparsification via End-to-End Optimization of Context Ranking](https://arxiv.org/abs/2609.13141) ![](https://img.shields.io/badge/arXiv-2026.09-red)
+- [HashAttention: Semantic Sparsity for Faster Inference](https://arxiv.org/abs/2412.14468) ![](https://img.shields.io/badge/arXiv-2024.12-red)
+- [HATA: Trainable and Hardware-Efficient Hash-Aware Top-k Attention for Scalable Large Model Inference](https://arxiv.org/abs/2506.02572) ![](https://img.shields.io/badge/arXiv-2025.06-red) ![](https://img.shields.io/badge/Findings_of_ACL-2025-yellow)
+- [SeerAttention: Learning Intrinsic Sparse Attention in Your LLMs](https://arxiv.org/abs/2410.13276) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [SeerAttention-R: Sparse Attention Adaptation for Long Reasoning](https://arxiv.org/abs/2506.08889) ![](https://img.shields.io/badge/arXiv-2025.06-red)
+- [SpotAttention: Plug-In Block-Sparse Routing for Pretrained Long-Context Transformers](https://arxiv.org/abs/2606.22874) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [MiniMax Sparse Attention](https://arxiv.org/abs/2606.13392) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [MiniMax-M3](https://huggingface.co/MiniMaxAI/MiniMax-M3) ![](https://img.shields.io/badge/Model_Card-2026-yellow)
+- [On the Design of Qwen3.8-Next Architecture: Evaluation, Efficiency, and Training Stability](https://arxiv.org/abs/2608.30320) ![](https://img.shields.io/badge/arXiv-2026.08-red)
+- [Qwen3.8-Flash-Next Technical Report and Model Card](https://github.com/QwenLM/Qwen3.8-Flash-Next) ![](https://img.shields.io/badge/Technical_Report-2026-yellow)
+- [DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence](https://arxiv.org/abs/2606.19348) ![](https://img.shields.io/badge/arXiv-2026.06-red)
 
 <a id="temporal-and-cross-layer-reuse"></a>
 
 ### 时间与跨层复用
 
-该类别通过复用已有稀疏支持集来摊薄索引成本。
+该类别通过复用已有稀疏支持集来摊薄索引成本，包括在相邻查询或解码步骤间的时间支持集复用和沿网络深度的跨层索引复用。
 
-  - **时间支持集复用：** 在相邻查询或解码步骤之间复用候选支持集。
-  - **跨层索引复用：** 沿网络深度复用索引或 Top-k 决策。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Recall Before You Rank: Similarity-Guided Top-$K$ Reuse for Efficient Long-Context Attention](https://arxiv.org/abs/2607.27692) ![](https://img.shields.io/badge/arXiv-2026.07-red) | 时间支持集复用 | 2026.07 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [TidalDecode: Fast and Accurate LLM Decoding with Position Persistent Sparse Attention](https://arxiv.org/abs/2410.05076) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 跨层索引复用 | 2024.10 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Kascade: A Practical Sparse Attention Method for Long-Context LLM Inference](https://arxiv.org/abs/2512.16391) ![](https://img.shields.io/badge/arXiv-2025.12-red) | 跨层索引复用 | 2025.12 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse](https://arxiv.org/abs/2603.12201) ![](https://img.shields.io/badge/arXiv-2026.03-red) | 跨层索引复用 | 2026.03 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2) ![](https://img.shields.io/badge/Model_Card-2026-yellow) | 跨层索引复用 | 2026.06 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [GLM-5.3](https://huggingface.co/zai-org/GLM-5.3) ![](https://img.shields.io/badge/Model_Card-2026-yellow) | 跨层索引复用 | 2026.08 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [You Only Index Once: Cross-Layer Sparse Attention with Shared Routing](https://arxiv.org/abs/2606.06467) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 跨层索引复用 | 2026.06 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression](https://arxiv.org/abs/2609.19969) ![](https://img.shields.io/badge/arXiv-2026.09-red) | 跨层索引复用 | 2026.09 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [HySparse: A Hybrid Sparse Attention Architecture with Oracle Token Selection and KV Cache Sharing](https://arxiv.org/abs/2602.03560) ![](https://img.shields.io/badge/arXiv-2026.02-red) | 跨层索引复用 | 2026.02 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [HySparse2: Hybrid Sparse Attention with Two-Level KV Sharing](https://arxiv.org/abs/2609.26368) ![](https://img.shields.io/badge/arXiv-2026.09-red) | 跨层索引复用 | 2026.09 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
+- [Recall Before You Rank: Similarity-Guided Top-$K$ Reuse for Efficient Long-Context Attention](https://arxiv.org/abs/2607.27692) ![](https://img.shields.io/badge/arXiv-2026.07-red)
+- [TidalDecode: Fast and Accurate LLM Decoding with Position Persistent Sparse Attention](https://arxiv.org/abs/2410.05076) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [Kascade: A Practical Sparse Attention Method for Long-Context LLM Inference](https://arxiv.org/abs/2512.16391) ![](https://img.shields.io/badge/arXiv-2025.12-red)
+- [IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse](https://arxiv.org/abs/2603.12201) ![](https://img.shields.io/badge/arXiv-2026.03-red)
+- [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2) ![](https://img.shields.io/badge/Model_Card-2026-yellow)
+- [GLM-5.3](https://huggingface.co/zai-org/GLM-5.3) ![](https://img.shields.io/badge/Model_Card-2026-yellow)
+- [You Only Index Once: Cross-Layer Sparse Attention with Shared Routing](https://arxiv.org/abs/2606.06467) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression](https://arxiv.org/abs/2609.19969) ![](https://img.shields.io/badge/arXiv-2026.09-red)
+- [HySparse: A Hybrid Sparse Attention Architecture with Oracle Token Selection and KV Cache Sharing](https://arxiv.org/abs/2602.03560) ![](https://img.shields.io/badge/arXiv-2026.02-red)
+- [HySparse2: Hybrid Sparse Attention with Two-Level KV Sharing](https://arxiv.org/abs/2609.26368) ![](https://img.shields.io/badge/arXiv-2026.09-red)
 
 <a id="linear-attention"></a>
 
@@ -382,75 +345,53 @@ Softmax 注意力保留可枚举的显式记忆单元和归一化读出，其主
 
 ### 记忆更新规则
 
-该类别研究关联状态如何保留、擦除和写入。
+该类别研究关联状态如何保留、擦除和写入，涵盖累加与校正更新（含 Delta 式校正）、保留与门控状态编辑，以及基于损失的在线优化。
 
-  - **累加与校正更新：** 累积关联，并可通过 Delta 式更新校正已有预测。
-  - **保留与门控状态编辑：** 使用衰减、保留以及擦除/写入门控制状态内容。
-  - **基于损失的在线优化：** 将循环状态更新表述为针对局部目标的在线优化。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention](https://proceedings.mlr.press/v119/katharopoulos20a.html) ![](https://img.shields.io/badge/arXiv-2020.06-red) ![](https://img.shields.io/badge/ICML-2020-yellow) | 累加与校正更新 | 2020.06 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Linear Transformers Are Secretly Fast Weight Programmers](https://arxiv.org/abs/2102.11174) ![](https://img.shields.io/badge/arXiv-2021.02-red) | 累加与校正更新 | 2021.02 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Parallelizing Linear Transformers with the Delta Rule over Sequence Length](https://arxiv.org/abs/2406.06484) ![](https://img.shields.io/badge/arXiv-2024.06-red) | 累加与校正更新 | 2024.06 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products](https://arxiv.org/abs/2502.10297) ![](https://img.shields.io/badge/arXiv-2025.02-red) | 累加与校正更新 | 2025.02 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Retentive Network: A Successor to Transformer for Large Language Models](https://arxiv.org/abs/2307.08621) ![](https://img.shields.io/badge/arXiv-2023.07-red) | 保留与门控状态编辑 | 2023.07 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [MiniMax-01: Scaling Foundation Models with Lightning Attention](https://arxiv.org/abs/2501.08313) ![](https://img.shields.io/badge/arXiv-2025.01-red) | 保留与门控状态编辑 | 2025.01 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [RWKV: Reinventing RNNs for the Transformer Era](https://arxiv.org/abs/2305.13048) ![](https://img.shields.io/badge/arXiv-2023.05-red) | 保留与门控状态编辑 | 2023.05 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Eagle and Finch: RWKV with Matrix-Valued States and Dynamic Recurrence](https://arxiv.org/abs/2404.05892) ![](https://img.shields.io/badge/arXiv-2024.04-red) | 保留与门控状态编辑 | 2024.04 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Gated Linear Attention Transformers with Hardware-Efficient Training](https://arxiv.org/abs/2312.06635) ![](https://img.shields.io/badge/arXiv-2023.12-red) | 保留与门控状态编辑 | 2023.12 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [HGRN2: Gated Linear RNNs with State Expansion](https://arxiv.org/abs/2404.07904) ![](https://img.shields.io/badge/arXiv-2024.04-red) | 保留与门控状态编辑 | 2024.04 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://proceedings.iclr.cc/paper_files/paper/2025/hash/4904fad153f6434a7bcf04465d4be2cc-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2024.12-red) ![](https://img.shields.io/badge/ICLR-2025-yellow) | 保留与门控状态编辑 | 2024.12 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [RWKV-7 "Goose" with Expressive Dynamic State Evolution](https://arxiv.org/abs/2503.14456) ![](https://img.shields.io/badge/arXiv-2025.03-red) | 保留与门控状态编辑 | 2025.03 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Kimi Linear: An Expressive, Efficient Attention Architecture](https://arxiv.org/abs/2510.26692) ![](https://img.shields.io/badge/arXiv-2025.10-red) | 保留与门控状态编辑 | 2025.10 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Gated DeltaNet-2: Decoupling Erase and Write in Linear Attention](https://arxiv.org/abs/2605.22791) ![](https://img.shields.io/badge/arXiv-2026.05-red) | 保留与门控状态编辑 | 2026.05 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Erase-then-Delta Attention: Decoupling Erase and Write Addresses in Delta-Rule Linear Attention](https://arxiv.org/abs/2606.26560) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 保留与门控状态编辑 | 2026.06 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Learning to (Learn at Test Time): RNNs with Expressive Hidden States](https://arxiv.org/abs/2407.04620) ![](https://img.shields.io/badge/arXiv-2024.07-red) | 基于损失的在线优化 | 2024.07 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Test-time regression: a unifying framework for designing sequence models with associative memory](https://www.jmlr.org/papers/v27/25-0903.html) ![](https://img.shields.io/badge/JMLR-2026-yellow) | 基于损失的在线优化 | 2025.01 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
+- [Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention](https://proceedings.mlr.press/v119/katharopoulos20a.html) ![](https://img.shields.io/badge/arXiv-2020.06-red) ![](https://img.shields.io/badge/ICML-2020-yellow)
+- [Linear Transformers Are Secretly Fast Weight Programmers](https://arxiv.org/abs/2102.11174) ![](https://img.shields.io/badge/arXiv-2021.02-red)
+- [Parallelizing Linear Transformers with the Delta Rule over Sequence Length](https://arxiv.org/abs/2406.06484) ![](https://img.shields.io/badge/arXiv-2024.06-red)
+- [DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products](https://arxiv.org/abs/2502.10297) ![](https://img.shields.io/badge/arXiv-2025.02-red)
+- [Retentive Network: A Successor to Transformer for Large Language Models](https://arxiv.org/abs/2307.08621) ![](https://img.shields.io/badge/arXiv-2023.07-red)
+- [MiniMax-01: Scaling Foundation Models with Lightning Attention](https://arxiv.org/abs/2501.08313) ![](https://img.shields.io/badge/arXiv-2025.01-red)
+- [RWKV: Reinventing RNNs for the Transformer Era](https://arxiv.org/abs/2305.13048) ![](https://img.shields.io/badge/arXiv-2023.05-red)
+- [Eagle and Finch: RWKV with Matrix-Valued States and Dynamic Recurrence](https://arxiv.org/abs/2404.05892) ![](https://img.shields.io/badge/arXiv-2024.04-red)
+- [Gated Linear Attention Transformers with Hardware-Efficient Training](https://arxiv.org/abs/2312.06635) ![](https://img.shields.io/badge/arXiv-2023.12-red)
+- [HGRN2: Gated Linear RNNs with State Expansion](https://arxiv.org/abs/2404.07904) ![](https://img.shields.io/badge/arXiv-2024.04-red)
+- [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://proceedings.iclr.cc/paper_files/paper/2025/hash/4904fad153f6434a7bcf04465d4be2cc-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2024.12-red) ![](https://img.shields.io/badge/ICLR-2025-yellow)
+- [RWKV-7 "Goose" with Expressive Dynamic State Evolution](https://arxiv.org/abs/2503.14456) ![](https://img.shields.io/badge/arXiv-2025.03-red)
+- [Kimi Linear: An Expressive, Efficient Attention Architecture](https://arxiv.org/abs/2510.26692) ![](https://img.shields.io/badge/arXiv-2025.10-red)
+- [Gated DeltaNet-2: Decoupling Erase and Write in Linear Attention](https://arxiv.org/abs/2605.22791) ![](https://img.shields.io/badge/arXiv-2026.05-red)
+- [Erase-then-Delta Attention: Decoupling Erase and Write Addresses in Delta-Rule Linear Attention](https://arxiv.org/abs/2606.26560) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [Learning to (Learn at Test Time): RNNs with Expressive Hidden States](https://arxiv.org/abs/2407.04620) ![](https://img.shields.io/badge/arXiv-2024.07-red)
+- [Test-time regression: a unifying framework for designing sequence models with associative memory](https://www.jmlr.org/papers/v27/25-0903.html) ![](https://img.shields.io/badge/JMLR-2026-yellow)
 
 <a id="capacity-expansion"></a>
 
 ### 容量扩展
 
-该类别通过增加可寻址状态资源缓解固定状态容量瓶颈。
+该类别通过增加可寻址状态资源缓解固定状态容量瓶颈，包括仅激活选定分区的稀疏状态扩展和选择特定状态行进行 Delta 式操作的稀疏 Delta 记忆。
 
-  - **稀疏状态扩展：** 扩大状态容量，但每次只激活选定的状态分区。
-  - **稀疏 Delta 记忆：** 选择特定状态行执行 Delta 式更新与检索。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Scaling Linear Attention with Sparse State Expansion](https://arxiv.org/abs/2507.16577) ![](https://img.shields.io/badge/arXiv-2025.07-red) | 稀疏状态扩展 | 2025.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Sparse Delta Memory: Scaling the State of Linear RNNs through Sparsity](https://arxiv.org/abs/2607.07386) ![](https://img.shields.io/badge/arXiv-2026.07-red) | 稀疏 Delta 记忆 | 2026.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
+- [Scaling Linear Attention with Sparse State Expansion](https://arxiv.org/abs/2507.16577) ![](https://img.shields.io/badge/arXiv-2025.07-red)
+- [Sparse Delta Memory: Scaling the State of Linear RNNs through Sparsity](https://arxiv.org/abs/2607.07386) ![](https://img.shields.io/badge/arXiv-2026.07-red)
 
 <a id="temporal-expansion"></a>
 
 ### 时间扩展
 
-该类别扩展线性注意力能够表示的时间范围。
+该类别扩展线性注意力能够表示的时间范围，涵盖多时间尺度上的对数线性分组、根据序列内容自适应调整的动态分段，以及为不同关联或时间尺度维护多个循环状态的 token 级多头状态。
 
-  - **对数线性分组：** 在按对数间隔分布的时间尺度上维护历史摘要。
-  - **动态分段：** 根据序列内容自适应调整分段边界或摘要分辨率。
-  - **token 级多头状态：** 为每个 token 维护多个循环状态，以表示不同关联或时间尺度。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Log-Linear Attention](https://arxiv.org/abs/2506.04761) ![](https://img.shields.io/badge/arXiv-2025.06-red) | 对数线性分组 | 2025.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Dynamic Linear Attention](https://arxiv.org/abs/2606.10650) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 动态分段 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [MHLA: Restoring Expressivity of Linear Attention via Token-Level Multi-Head](https://arxiv.org/abs/2601.07832) ![](https://img.shields.io/badge/arXiv-2026.01-red) | token 级多头状态 | 2026.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
+- [Log-Linear Attention](https://arxiv.org/abs/2506.04761) ![](https://img.shields.io/badge/arXiv-2025.06-red)
+- [Dynamic Linear Attention](https://arxiv.org/abs/2606.10650) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [MHLA: Restoring Expressivity of Linear Attention via Token-Level Multi-Head](https://arxiv.org/abs/2601.07832) ![](https://img.shields.io/badge/arXiv-2026.01-red)
 
 <a id="auxiliary-coordination-and-routing"></a>
 
 ### 辅助协调与路由
 
-该类别在基础递归状态之外增加协调机制。
+该类别在基础递归状态之外增加协调机制，包括在独立特征头之间恢复竞争或通信的特征头协调和跨层路由或复用循环状态的跨深度路由。
 
-  - **特征头协调：** 在原本相互独立的特征头之间恢复竞争或通信。
-  - **跨深度路由：** 在不同网络层之间路由或复用循环状态。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Softmax Linear Attention: Reclaiming Global Competition](https://arxiv.org/abs/2602.01744) ![](https://img.shields.io/badge/arXiv-2026.02-red) | 特征头协调 | 2026.02 | ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Linear Attention Architectures: Mechanisms, Trade-offs, and Cross-Layer Routing](https://arxiv.org/abs/2607.07953) ![](https://img.shields.io/badge/arXiv-2026.07-red) | 跨深度路由 | 2026.07 | ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [Softmax Linear Attention: Reclaiming Global Competition](https://arxiv.org/abs/2602.01744) ![](https://img.shields.io/badge/arXiv-2026.02-red)
+- [Linear Attention Architectures: Mechanisms, Trade-offs, and Cross-Layer Routing](https://arxiv.org/abs/2607.07953) ![](https://img.shields.io/badge/arXiv-2026.07-red)
 
 <a id="state-space-models"></a>
 
@@ -463,39 +404,29 @@ Softmax 注意力保留可枚举的显式记忆单元和归一化读出，其主
 
 ### 状态动力学与选择性控制
 
-该类别关注状态沿序列传播时的动力学设计。
+该类别关注状态沿序列传播时的动力学设计，从各序列位置应用共享稳定转移的结构化时不变动力学，到由当前输入调节状态控制的输入条件选择性动力学。
 
-  - **结构化时不变动力学：** 在各序列位置应用共享且稳定的学习型状态转移。
-  - **输入条件选择性动力学：** 由当前输入调节状态转移、写入、保留或读取。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [HiPPO: Recurrent Memory with Optimal Polynomial Projections](https://arxiv.org/abs/2008.07669) ![](https://img.shields.io/badge/arXiv-2020.08-red) ![](https://img.shields.io/badge/NeurIPS-2020-yellow) | 结构化时不变动力学 | 2020.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Combining Recurrent, Convolutional, and Continuous-time Models with Linear State-Space Layers](https://arxiv.org/abs/2110.13985) ![](https://img.shields.io/badge/arXiv-2021.10-red) ![](https://img.shields.io/badge/NeurIPS-2021-yellow) | 结构化时不变动力学 | 2021.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Efficiently Modeling Long Sequences with Structured State Spaces](https://openreview.net/forum?id=uYLFoz1vlAC) ![](https://img.shields.io/badge/arXiv-2021.11-red) ![](https://img.shields.io/badge/ICLR-2022-yellow) | 结构化时不变动力学 | 2021.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [On the Parameterization and Initialization of Diagonal State Space Models](https://arxiv.org/abs/2206.11893) ![](https://img.shields.io/badge/arXiv-2022.06-red) | 结构化时不变动力学 | 2022.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Simplified State Space Layers for Sequence Modeling](https://arxiv.org/abs/2208.04933) ![](https://img.shields.io/badge/arXiv-2022.08-red) | 结构化时不变动力学 | 2022.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Mamba: Linear-Time Sequence Modeling with Selective State Spaces](https://openreview.net/forum?id=tEYskw1VY2) ![](https://img.shields.io/badge/arXiv-2023.12-red) ![](https://img.shields.io/badge/COLM-2024-yellow) | 输入条件选择性动力学 | 2023.12 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [Transformers are SSMs: Generalized Models and Efficient Algorithms Through Structured State Space Duality](https://proceedings.mlr.press/v235/dao24a.html) ![](https://img.shields.io/badge/arXiv-2024.05-red) ![](https://img.shields.io/badge/ICML-2024-yellow) | 输入条件选择性动力学 | 2024.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
+- [HiPPO: Recurrent Memory with Optimal Polynomial Projections](https://arxiv.org/abs/2008.07669) ![](https://img.shields.io/badge/arXiv-2020.08-red) ![](https://img.shields.io/badge/NeurIPS-2020-yellow)
+- [Combining Recurrent, Convolutional, and Continuous-time Models with Linear State-Space Layers](https://arxiv.org/abs/2110.13985) ![](https://img.shields.io/badge/arXiv-2021.10-red) ![](https://img.shields.io/badge/NeurIPS-2021-yellow)
+- [Efficiently Modeling Long Sequences with Structured State Spaces](https://openreview.net/forum?id=uYLFoz1vlAC) ![](https://img.shields.io/badge/arXiv-2021.11-red) ![](https://img.shields.io/badge/ICLR-2022-yellow)
+- [On the Parameterization and Initialization of Diagonal State Space Models](https://arxiv.org/abs/2206.11893) ![](https://img.shields.io/badge/arXiv-2022.06-red)
+- [Simplified State Space Layers for Sequence Modeling](https://arxiv.org/abs/2208.04933) ![](https://img.shields.io/badge/arXiv-2022.08-red)
+- [Mamba: Linear-Time Sequence Modeling with Selective State Spaces](https://openreview.net/forum?id=tEYskw1VY2) ![](https://img.shields.io/badge/arXiv-2023.12-red) ![](https://img.shields.io/badge/COLM-2024-yellow)
+- [Transformers are SSMs: Generalized Models and Efficient Algorithms Through Structured State Space Duality](https://proceedings.mlr.press/v235/dao24a.html) ![](https://img.shields.io/badge/arXiv-2024.05-red) ![](https://img.shields.io/badge/ICML-2024-yellow)
 
 <a id="state-organization-and-read-write-refinements"></a>
 
 ### 状态组织与读写细化
 
-该类别细化状态组织与访问方式。
+该类别细化状态组织与访问方式，包括显式分离或控制读写路径的读写接口和使用分块、滤波或受约束几何来组织状态和更新的状态组织与更新几何。
 
-  - **读写接口：** 显式分离或控制状态读取与状态写入路径。
-  - **状态组织与更新几何：** 使用分块、滤波或受约束几何来组织状态和更新。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Hungry Hungry Hippos: Towards Language Modeling with State Space Models](https://arxiv.org/abs/2212.14052) ![](https://img.shields.io/badge/arXiv-2022.12-red) | 读写接口 | 2022.12 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Zoology: Measuring and Improving Recall in Efficient Language Models](https://arxiv.org/html/2312.04927v1) ![](https://img.shields.io/badge/arXiv-2023.12-red) ![](https://img.shields.io/badge/ICLR-2024-yellow) | 读写接口 | 2023.12 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Mamba-3: Improved Sequence Modeling using State Space Principles](https://arxiv.org/abs/2603.15569) ![](https://img.shields.io/badge/arXiv-2026.03-red) | 读写接口 | 2026.03 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [MIMOMamba: From Scalar Duality to Matrix-Valued Attention](https://openreview.net/forum?id=UmQ07sj13y) ![](https://img.shields.io/badge/ICML-2026-yellow) | 读写接口 | 2026.05 | ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) |
-| [Graph Signal Processing Meets Mamba2: Adaptive Filter Bank via Delta Modulation](https://openreview.net/forum?id=w0XhHcXfKv) ![](https://img.shields.io/badge/ICLR-2026-yellow) | 状态组织与更新几何 | 2026.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [MuonSSM: Orthogonalizing State Space Models for Sequence Modeling](https://arxiv.org/abs/2606.30461) ![](https://img.shields.io/badge/arXiv-2026.06-red) ![](https://img.shields.io/badge/ICML-2026-yellow) | 状态组织与更新几何 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%BB-Update-54A24B) |
-| [The Illusion of State in State-Space Models](https://arxiv.org/html/2404.08819v3) ![](https://img.shields.io/badge/arXiv-2024.04-red) ![](https://img.shields.io/badge/ICML-2024-yellow) | 状态组织与更新几何 | 2024.04 | — |
+- [Hungry Hungry Hippos: Towards Language Modeling with State Space Models](https://arxiv.org/abs/2212.14052) ![](https://img.shields.io/badge/arXiv-2022.12-red)
+- [Zoology: Measuring and Improving Recall in Efficient Language Models](https://arxiv.org/html/2312.04927v1) ![](https://img.shields.io/badge/arXiv-2023.12-red) ![](https://img.shields.io/badge/ICLR-2024-yellow)
+- [Mamba-3: Improved Sequence Modeling using State Space Principles](https://arxiv.org/abs/2603.15569) ![](https://img.shields.io/badge/arXiv-2026.03-red)
+- [MIMOMamba: From Scalar Duality to Matrix-Valued Attention](https://openreview.net/forum?id=UmQ07sj13y) ![](https://img.shields.io/badge/ICML-2026-yellow)
+- [Graph Signal Processing Meets Mamba2: Adaptive Filter Bank via Delta Modulation](https://openreview.net/forum?id=w0XhHcXfKv) ![](https://img.shields.io/badge/ICLR-2026-yellow)
+- [MuonSSM: Orthogonalizing State Space Models for Sequence Modeling](https://arxiv.org/abs/2606.30461) ![](https://img.shields.io/badge/arXiv-2026.06-red) ![](https://img.shields.io/badge/ICML-2026-yellow)
+- [The Illusion of State in State-Space Models](https://arxiv.org/html/2404.08819v3) ![](https://img.shields.io/badge/arXiv-2024.04-red) ![](https://img.shields.io/badge/ICML-2024-yellow)
 
 **分析性参考。** *The Illusion of State in State-Space Models* 分析了特定状态转移类别与数值假设下的状态跟踪局限。本文将其作为理解相关限制的参考，不为其分配机制修改标签。
 
@@ -510,82 +441,57 @@ Softmax 注意力保留可枚举的显式记忆单元和归一化读出，其主
 
 ### 层级混合
 
-该类别沿网络深度分配异构序列混合器。
+该类别沿网络深度分配异构序列混合器，涵盖预定义分配、直接诊断选择、基于对齐的选择和迭代蒸馏引导选择。
 
-  - **预定义分配：** 按固定调度将不同机制分配到各层。
-  - **直接诊断选择：** 通过局部敏感度或诊断测量识别可替换层。
-  - **基于对齐的选择：** 通过匹配原注意力模型的表示或输出来选择替换层。
-  - **迭代蒸馏引导选择：** 交替执行机制选择与教师引导的适配。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Griffin: Mixing Gated Linear Recurrences with Local Attention for Efficient Language Models](https://arxiv.org/abs/2402.19427) ![](https://img.shields.io/badge/arXiv-2024.02-red) | 预定义分配 | 2024.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Jamba: A Hybrid Transformer-Mamba Language Model](https://arxiv.org/abs/2403.19887) ![](https://img.shields.io/badge/arXiv-2024.03-red) | 预定义分配 | 2024.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Samba: Simple Hybrid State Space Models for Efficient Unlimited Context Language Modeling](https://arxiv.org/abs/2406.07522) ![](https://img.shields.io/badge/arXiv-2024.06-red) | 预定义分配 | 2024.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Zamba: A Compact 7B SSM Hybrid Model](https://arxiv.org/abs/2405.16712) ![](https://img.shields.io/badge/arXiv-2024.05-red) | 预定义分配 | 2024.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [The Zamba2 Suite: Technical Report](https://arxiv.org/abs/2411.15242) ![](https://img.shields.io/badge/arXiv-2024.11-red) | 预定义分配 | 2024.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [HySparse: A Hybrid Sparse Attention Architecture with Oracle Token Selection and KV Cache Sharing](https://arxiv.org/abs/2602.03560) ![](https://img.shields.io/badge/arXiv-2026.02-red) | 预定义分配 | 2026.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [HySparse2: Hybrid Sparse Attention with Two-Level KV Sharing](https://arxiv.org/abs/2609.26368) ![](https://img.shields.io/badge/arXiv-2026.09-red) | 预定义分配 | 2026.09 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [LightTransfer: Your Long-Context LLM is Secretly a Hybrid Model with Effortless Adaptation](https://arxiv.org/abs/2410.13846) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 直接诊断选择 | 2024.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Priming: Hybrid State Space Models From Pre-trained Transformers](https://arxiv.org/abs/2605.08301) ![](https://img.shields.io/badge/arXiv-2026.05-red) | 直接诊断选择 | 2026.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Jet-Nemotron: Efficient Language Model with Post Neural Architecture Search](https://arxiv.org/abs/2508.15884) ![](https://img.shields.io/badge/arXiv-2025.08-red) ![](https://img.shields.io/badge/NeurIPS-2025-yellow) | 基于对齐的选择 | 2025.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Hybrid Linear Attention Done Right: Efficient Distillation and Effective Architectures for Extremely Long Contexts](https://arxiv.org/abs/2601.22156) ![](https://img.shields.io/badge/arXiv-2026.01-red) | 基于对齐的选择 | 2026.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Distilling to Hybrid Attention Models via KL-Guided Layer Selection](https://arxiv.org/abs/2512.20569) ![](https://img.shields.io/badge/arXiv-2025.12-red) | 迭代蒸馏引导选择 | 2025.12 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [Griffin: Mixing Gated Linear Recurrences with Local Attention for Efficient Language Models](https://arxiv.org/abs/2402.19427) ![](https://img.shields.io/badge/arXiv-2024.02-red)
+- [Jamba: A Hybrid Transformer-Mamba Language Model](https://arxiv.org/abs/2403.19887) ![](https://img.shields.io/badge/arXiv-2024.03-red)
+- [Samba: Simple Hybrid State Space Models for Efficient Unlimited Context Language Modeling](https://arxiv.org/abs/2406.07522) ![](https://img.shields.io/badge/arXiv-2024.06-red)
+- [Zamba: A Compact 7B SSM Hybrid Model](https://arxiv.org/abs/2405.16712) ![](https://img.shields.io/badge/arXiv-2024.05-red)
+- [The Zamba2 Suite: Technical Report](https://arxiv.org/abs/2411.15242) ![](https://img.shields.io/badge/arXiv-2024.11-red)
+- [HySparse: A Hybrid Sparse Attention Architecture with Oracle Token Selection and KV Cache Sharing](https://arxiv.org/abs/2602.03560) ![](https://img.shields.io/badge/arXiv-2026.02-red)
+- [HySparse2: Hybrid Sparse Attention with Two-Level KV Sharing](https://arxiv.org/abs/2609.26368) ![](https://img.shields.io/badge/arXiv-2026.09-red)
+- [LightTransfer: Your Long-Context LLM is Secretly a Hybrid Model with Effortless Adaptation](https://arxiv.org/abs/2410.13846) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [Priming: Hybrid State Space Models From Pre-trained Transformers](https://arxiv.org/abs/2605.08301) ![](https://img.shields.io/badge/arXiv-2026.05-red)
+- [Jet-Nemotron: Efficient Language Model with Post Neural Architecture Search](https://arxiv.org/abs/2508.15884) ![](https://img.shields.io/badge/arXiv-2025.08-red) ![](https://img.shields.io/badge/NeurIPS-2025-yellow)
+- [Hybrid Linear Attention Done Right: Efficient Distillation and Effective Architectures for Extremely Long Contexts](https://arxiv.org/abs/2601.22156) ![](https://img.shields.io/badge/arXiv-2026.01-red)
+- [Distilling to Hybrid Attention Models via KL-Guided Layer Selection](https://arxiv.org/abs/2512.20569) ![](https://img.shields.io/badge/arXiv-2025.12-red)
 
 <a id="head-wise-hybrid"></a>
 
 ### 头级混合
 
-该类别在同一层内按注意力头或通道组组合不同机制。
+该类别在同一层内按注意力头或通道组组合不同机制，涵盖固定头分配、功能感知头选择、输入自适应头路由和深度自适应头分配。
 
-  - **固定头分配：** 将不同机制分配给预先确定的头组。
-  - **功能感知头选择：** 根据学习到或诊断出的功能角色选择注意力头。
-  - **输入自适应头路由：** 针对每个输入动态选择头级机制。
-  - **深度自适应头分配：** 沿网络深度改变不同机制的头部配比。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Hymba: A Hybrid-head Architecture for Small Language Models](https://proceedings.iclr.cc/paper_files/paper/2025/hash/f32def07618040e540e0a6182e290562-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2024.11-red) ![](https://img.shields.io/badge/ICLR-2025-yellow) | 固定头分配 | 2024.11 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Falcon-H1: A Family of Hybrid-Head Language Models Redefining Efficiency and Performance](https://arxiv.org/abs/2507.22448) ![](https://img.shields.io/badge/arXiv-2025.07-red) | 固定头分配 | 2025.07 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [DuoAttention: Efficient Long-Context LLM Inference with Retrieval and Streaming Heads](https://arxiv.org/abs/2410.10819) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 功能感知头选择 | 2024.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [HydraHead: From Head-Level Functional Heterogeneity to Specialized Attention Hybridization](https://arxiv.org/abs/2606.20097) ![](https://img.shields.io/badge/arXiv-2026.06-red) | 功能感知头选择 | 2026.06 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Elastic Attention: Test-time Adaptive Sparsity Ratios for Efficient Transformers](https://arxiv.org/abs/2601.17367) ![](https://img.shields.io/badge/arXiv-2026.01-red) | 输入自适应头路由 | 2026.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Modern Transformers Are Implicit Hybrids: From Functional Differentiation to Principled Hybrid Architecture Design](https://arxiv.org/abs/2609.02986) ![](https://img.shields.io/badge/arXiv-2026.09-red) | 深度自适应头分配 | 2026.09 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [Hymba: A Hybrid-head Architecture for Small Language Models](https://proceedings.iclr.cc/paper_files/paper/2025/hash/f32def07618040e540e0a6182e290562-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2024.11-red) ![](https://img.shields.io/badge/ICLR-2025-yellow)
+- [Falcon-H1: A Family of Hybrid-Head Language Models Redefining Efficiency and Performance](https://arxiv.org/abs/2507.22448) ![](https://img.shields.io/badge/arXiv-2025.07-red)
+- [DuoAttention: Efficient Long-Context LLM Inference with Retrieval and Streaming Heads](https://arxiv.org/abs/2410.10819) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [HydraHead: From Head-Level Functional Heterogeneity to Specialized Attention Hybridization](https://arxiv.org/abs/2606.20097) ![](https://img.shields.io/badge/arXiv-2026.06-red)
+- [Elastic Attention: Test-time Adaptive Sparsity Ratios for Efficient Transformers](https://arxiv.org/abs/2601.17367) ![](https://img.shields.io/badge/arXiv-2026.01-red)
+- [Modern Transformers Are Implicit Hybrids: From Functional Differentiation to Principled Hybrid Architecture Design](https://arxiv.org/abs/2609.02986) ![](https://img.shields.io/badge/arXiv-2026.09-red)
 
 <a id="branch-wise-hybrid"></a>
 
 ### 分支级混合
 
-该类别在同一 block 内维护多条记忆路径。Memorizing Transformer 作为边界案例保留：其外部 kNN 数据库不属于核心分类所强调的模型内部记忆，但门控读出接口可与内部记忆的分支融合直接比较。
+该类别在同一 block 内维护多条记忆路径，包括在输出投影前合并各分支读出的读出级分支融合和通过相加、门控或投影合并独立输出的输出级分支融合。Memorizing Transformer 作为边界案例保留：其外部 kNN 数据库不属于核心分类所强调的模型内部记忆，但门控读出接口可与内部记忆的分支融合直接比较。
 
-  - **读出级分支融合：** 在最终输出投影之前合并各分支的读出。
-  - **输出级分支融合：** 通过相加、门控或投影合并各分支独立计算的输出。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [Block-Recurrent Transformers](https://proceedings.neurips.cc/paper_files/paper/2022/hash/d6e0bbb9fc3f4c10950052ec2359355c-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2022.03-red) ![](https://img.shields.io/badge/NeurIPS-2022-yellow) | 读出级分支融合 | 2022.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Memorizing Transformers](https://arxiv.org/abs/2203.08913) ![](https://img.shields.io/badge/arXiv-2022.03-red) | 读出级分支融合 | 2022.03 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Leave No Context Behind: Efficient Infinite Context Transformers with Infini-attention](https://arxiv.org/abs/2404.07143) ![](https://img.shields.io/badge/arXiv-2024.04-red) | 读出级分支融合 | 2024.04 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [DART: Decoded Attention over Recurrent States for Efficient Long-Context Sequence Modeling](https://arxiv.org/abs/2608.02032) ![](https://img.shields.io/badge/arXiv-2026.08-red) | 读出级分支融合 | 2026.08 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%86%97-Readout-B279A2) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
-| [Titans: Learning to Memorize at Test Time](https://arxiv.org/abs/2501.00663) ![](https://img.shields.io/badge/arXiv-2025.01-red) | 输出级分支融合 | 2025.01 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [Block-Recurrent Transformers](https://proceedings.neurips.cc/paper_files/paper/2022/hash/d6e0bbb9fc3f4c10950052ec2359355c-Abstract-Conference.html) ![](https://img.shields.io/badge/arXiv-2022.03-red) ![](https://img.shields.io/badge/NeurIPS-2022-yellow)
+- [Memorizing Transformers](https://arxiv.org/abs/2203.08913) ![](https://img.shields.io/badge/arXiv-2022.03-red)
+- [Leave No Context Behind: Efficient Infinite Context Transformers with Infini-attention](https://arxiv.org/abs/2404.07143) ![](https://img.shields.io/badge/arXiv-2024.04-red)
+- [DART: Decoded Attention over Recurrent States for Efficient Long-Context Sequence Modeling](https://arxiv.org/abs/2608.02032) ![](https://img.shields.io/badge/arXiv-2026.08-red)
+- [Titans: Learning to Memorize at Test Time](https://arxiv.org/abs/2501.00663) ![](https://img.shields.io/badge/arXiv-2025.01-red)
 
 <a id="token-wise-hybrid"></a>
 
 ### token 级混合
 
-该类别为不同 token 或分块选择记忆路径。
+该类别为不同 token 或分块选择记忆路径，涵盖基于位置的时间边界分配、使用内容相关性得分的内容得分分配，以及通过训练路由器实现的学习式操作分配。
 
-  - **时间边界分配：** 根据 token 位置或分段边界选择记忆路径。
-  - **内容得分分配：** 使用内容相关性得分路由 token 或分块。
-  - **学习式操作分配：** 训练路由器为每个 token 选择注意力或状态操作。
-
-| 文章 | 子类别 | 首次公开 | 五维对应 |
-|---|---|---:|---|
-| [LoLCATs: On Low-Rank Linearizing of Large Language Models](https://arxiv.org/abs/2410.10254) ![](https://img.shields.io/badge/arXiv-2024.10-red) | 时间边界分配 | 2024.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Native Hybrid Attention for Efficient Sequence Modeling](https://aclanthology.org/2026.acl-long.176/) ![](https://img.shields.io/badge/arXiv-2025.10-red) ![](https://img.shields.io/badge/ACL-2026-yellow) | 时间边界分配 | 2025.10 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [LoLA: Low-Rank Linear Attention With Sparse Caching](https://arxiv.org/abs/2505.23666) ![](https://img.shields.io/badge/arXiv-2025.05-red) | 内容得分分配 | 2025.05 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [STILL: Selecting Tokens for Intra-Layer Hybrid Attention to Linearize LLMs](https://arxiv.org/abs/2602.02180) ![](https://img.shields.io/badge/arXiv-2026.02-red) | 内容得分分配 | 2026.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) |
-| [Neural Attention Search Linear: Towards Adaptive Token-Level Hybrid Attention Models](https://arxiv.org/abs/2602.03681) ![](https://img.shields.io/badge/arXiv-2026.02-red) | 学习式操作分配 | 2026.02 | ![](https://img.shields.io/badge/%E2%96%A6-Representation-4C78A8) ![](https://img.shields.io/badge/%E2%8C%95-Access-D6A01D) ![](https://img.shields.io/badge/%E2%8A%95-Integration-E45756) |
+- [LoLCATs: On Low-Rank Linearizing of Large Language Models](https://arxiv.org/abs/2410.10254) ![](https://img.shields.io/badge/arXiv-2024.10-red)
+- [Native Hybrid Attention for Efficient Sequence Modeling](https://aclanthology.org/2026.acl-long.176/) ![](https://img.shields.io/badge/arXiv-2025.10-red) ![](https://img.shields.io/badge/ACL-2026-yellow)
+- [LoLA: Low-Rank Linear Attention With Sparse Caching](https://arxiv.org/abs/2505.23666) ![](https://img.shields.io/badge/arXiv-2025.05-red)
+- [STILL: Selecting Tokens for Intra-Layer Hybrid Attention to Linearize LLMs](https://arxiv.org/abs/2602.02180) ![](https://img.shields.io/badge/arXiv-2026.02-red)
+- [Neural Attention Search Linear: Towards Adaptive Token-Level Hybrid Attention Models](https://arxiv.org/abs/2602.03681) ![](https://img.shields.io/badge/arXiv-2026.02-red)
 
 
 <a id="contributing"></a>
