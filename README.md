@@ -27,7 +27,6 @@ A living survey and structured literature map of efficient sequence architecture
 
 ## Overview
 
----
 
 This repository accompanies the survey “[The Evolution of Attention in Large Language Models: Mechanisms, Trade-offs, and Emerging Trends](https://arxiv.org/abs/2609.39661).”
 
@@ -53,7 +52,6 @@ The resulting framework provides a common language for comparing today's archite
 
 ## Core Framework
 
----
 
 Different sequence architectures make preceding context available through visibly different operators. Softmax Attention retains separately addressable units, Sparse Attention limits which units are examined, and recurrent mechanisms continually compress history into one or more states. The survey compares them functionally as systems that maintain and use **contextual memory**: model-internal, input-dependent information available while processing the current sequence. This includes token KV entries, compressed tokens or chunks, memory slots, associative matrices, structured recurrent states, and heterogeneous combinations, but excludes pretrained parameters and external retrieval corpora.
 
@@ -125,7 +123,6 @@ These equations define functional roles rather than a universal computational gr
 
 ## Classification Logic and Family Mapping
 
----
 
 The survey taxonomy and the five-dimensional framework serve different purposes. The five research lines follow their principal technical questions and historical development; they are not mechanically derived from the five dimensions. Each work is assigned a principal research line according to its central contribution and lineage. A small number of cross-cutting methods are also indexed in a secondary table when they substantively contribute to another design direction; consequently, the list contains 131 classification records for 128 unique works. Dimensional tags provide a multi-label description of the memory functions each method modifies, allowing methods from different research lines to be compared when they intervene in the same functional role.
 
@@ -147,7 +144,6 @@ Hybrid Architecture requires a different interpretation because it composes hete
 
 ## Architecture Landscape and Future Directions
 
----
 
 Publicly documented LLM attention is **diversifying rather than converging**. Across 59 release-level records from 14 major model lineages, 58 are classifiable: 32 use one principal family and 26 are Hybrid, with Hybrid records rising from 0/6 in 2022–2023 to 17/27 in 2026. Most Hybrid designs still use predetermined layer-wise schedules, while only five records explicitly reuse KV representations, indexes, or Top-k decisions across layers. The frozen frontier snapshot below reinforces this coexistence: the 11 selected high-performing open-weight model endpoints span full GQA, sparse attention, latent compression, and recurrent–explicit hybrids, yet every architecture retains an explicit token-retrieval path. These observations describe adoption patterns and do not attribute model quality to any single mechanism.
 
@@ -187,7 +183,6 @@ Rather than viewing architectural evolution as a succession of operator replacem
 
 ## Survey Index
 
----
 
 - [Softmax Attention](#softmax-attention)
   - [Memory-Representation Efficiency](#memory-representation-efficiency)
@@ -217,7 +212,6 @@ Rather than viewing architectural evolution as a succession of operator replacem
 
 ## Softmax Attention
 
----
 
 Softmax Attention preserves explicitly enumerable memory units and normalized Softmax readout. Its main design directions reduce per-token representation cost, compress long histories, or modify how attention scores and head outputs are integrated.
 
@@ -282,7 +276,6 @@ This category leaves the underlying memory set intact and changes attention read
 
 ## Sparse Attention
 
----
 
 Sparse Attention retains fine-grained KV candidates while restricting the support read by each query. The taxonomy distinguishes where sparse supports come from, at what granularity they are formed, and whether routing results are reused.
 
@@ -384,7 +377,6 @@ This category amortizes indexing cost by reusing previously computed sparse supp
 
 ## Linear Attention
 
----
 
 Linear Attention replaces an enumerable token cache with one or more recurrent associative states. The canonical formulation uses context-length-independent state, while later variants expand, partition, or organize multiple states to increase capacity and temporal coverage. Its evolution centers on controlled state editing, capacity growth, broader temporal coverage, and auxiliary coordination or routing.
 
@@ -466,7 +458,6 @@ This category adds coordination around the base recurrence.
 
 ## State Space Models
 
----
 
 State Space Models compress history through structured state dynamics. The progression runs from stable time-invariant propagation to input-conditioned control and increasingly explicit read-write interfaces and state geometry.
 
@@ -514,7 +505,6 @@ This category refines state organization and access.
 
 ## Hybrid Architecture
 
----
 
 Hybrid Architecture is not a separate memory operator; it composes Softmax, Sparse, Linear Attention, and SSM mechanisms at different structural granularities, including layers, heads, branches, and tokens.
 
@@ -604,7 +594,6 @@ This category chooses memory paths for individual tokens or chunks.
 
 ## Contributing
 
----
 
 This repository is intended to become a community-maintained living survey.
 
@@ -624,7 +613,6 @@ If you identify missing work, incorrect metadata, broken links, or disagree with
 
 ## Citation
 
----
 
 ```bibtex
 @misc{tan2026evolution,
