@@ -165,14 +165,17 @@ Publicly documented LLM attention is **diversifying rather than converging**. Ac
 
 Rather than viewing architectural evolution as a succession of operator replacements, the survey interprets it as an expanding redesign of contextual memory—from mechanism-level control, through architecture-level coordination, to future stateful memory systems:
 
+> [!TIP]
 > **Mechanism Level — Expanding Control Scopes**
 >
 > Explicit-memory and state-based methods retain different memory interfaces, but both expand control across an increasingly overlapping set of memory functions.
 
+> [!TIP]
 > **Architecture Level — Memory Organization across Depth**
 >
 > Layer-wise composition distributes complementary memory processing across representational stages, while cross-layer reuse extends the lifetime of selected memory and routing artifacts. Together, they make network depth an emerging dimension of memory organization.
 
+> [!TIP]
 > **Forward-Looking Level — Stateful Multidimensional Memory Routing**
 >
 > The depth-wise perspective combines with temporal scope, substrate type, and representation granularity to motivate coordinated Sparse Write and Sparse Read over persistent contextual memory.
