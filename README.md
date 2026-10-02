@@ -76,7 +76,7 @@ The schema may describe a growing list of token KVs, bounded summary slots, an a
 <div align="center">
 
 $$
-\mathcal{M}_t^{+}=\operatorname{Update}_{\rho}\!\left(\mathcal{M}_t^{-},x_t\right).
+\mathcal{M}_t^{+}=\mathrm{Update}_{\rho}\!\left(\mathcal{M}_t^{-},x_t\right).
 $$
 
 </div>
@@ -88,7 +88,7 @@ This operator covers append-only KV caches, compression into bounded slots, recu
 <div align="center">
 
 $$
-\mathcal{C}_t=\operatorname{Access}_{\rho}\!\left(q_t,\widehat{\mathcal{M}}_t\right).
+\mathcal{C}_t=\mathrm{Access}_{\rho}\!\left(q_t,\widehat{\mathcal{M}}_t\right).
 $$
 
 </div>
@@ -100,7 +100,7 @@ The result may contain all causal token memories, a local or routed subset of to
 <div align="center">
 
 $$
-r_t=\operatorname{Readout}_{\rho}\!\left(q_t,\mathcal{C}_t\right).
+r_t=\mathrm{Readout}_{\rho}\!\left(q_t,\mathcal{C}_t\right).
 $$
 
 </div>
@@ -112,7 +112,7 @@ Examples include normalized query-key aggregation, associative-state contraction
 <div align="center">
 
 $$
-o_t=\operatorname{Integration}_{\rho}\!\left(r_t;x_t\right).
+o_t=\mathrm{Integration}_{\rho}\!\left(r_t;x_t\right).
 $$
 
 </div>
